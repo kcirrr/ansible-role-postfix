@@ -1,0 +1,24 @@
+---
+- name: Install postfix
+  ansible.builtin.apt:
+    name: postfix
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Start and enable postfix
+  ansible.builtin.systemd:
+    name: postfix
+    enabled: true
+    masked: false
+    state: started
+
+- name: Configure postfix
+  ansible.builtin.template:
+    src: main.cf.j2
+    dest: /etc/postfix/main.cf
+    owner: root
+    group: root
+    mode: '644'
+    validate: 'postfix check #%s'
+  notify: restart postfix
